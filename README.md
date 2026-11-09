@@ -79,7 +79,8 @@ Q5 CTEs	550 customers above the average INR 2,552.06
 Q6 window ranks	8 rows where RANK differs from ROW_NUMBER. Top per city: Bengaluru C0082 12,856.20; Chennai C0930 10,151.40; Delhi C0291 13,742.60; Hyderabad C0743 12,730.05; Mumbai C0693 14,766.55; Pune C0426 10,377.10
 Q7 running total	183 days, last cumulative INR 2,998,668.80
 
-TODO (one sentence): why ties make RANK() differ from ROW_NUMBER().
+TODO (one sentence):
+When two customers in a city have exactly the same total spend, RANK() gives them the same rank and then skips a number, while ROW_NUMBER() still gives every row a unique number, so the two columns differ from the second tied row onward.
 
 pandas cross-check: the pivot table (margins=True) grand total is INR 2,998,668.80, equal to the SQL total.
 
@@ -93,9 +94,10 @@ Pune	500,918.05	252.48	1,984
 
 Completed order_amount: mean 269.91, median 135.00, skewness 4.61, Q1 64.80, Q3 297.00, fences -283.50 / 645.30, outliers 0 below and 897 above. Strongest correlation: order_amount with discount_pct, -0.095 (order_amount with quantity +0.087; all others near 0).
 
-TODO (at most 200 words): answer the four questions (what is the data about, what do distributions look like, outliers or anomalies, relationships). Say that a correlation this small does not establish causation.
+TODO: 
+This data is 11,110 completed Instamart orders across six cities, with amount, discount, quantity and delivery time, all in INR. Order amounts are strongly right-skewed: the mean (269.91) is about double the median (135.00), and skewness is 4.61, so most orders are small and a few large ones pull the mean up. There are 897 outliers above the upper fence of 645.30 and none below. They look like genuine high-priced purchases, mostly electronics, so I kept them. The data errors in the raw files (duplicates, negative delivery times, unparseable amounts) were fixed during cleaning. All relationships are weak. The largest correlation is order_amount with discount_pct at -0.095, and order_amount with quantity is +0.087. A correlation this small does not establish causation, so I cannot say that discounts cause lower order amounts.
 
-Part B
+## Part B
 RFM (snapshot 2025-10-01, completed orders): 1,175 customers; recency median 19 (min 0, max 180); frequency mean 9.46 (max 33); monetary mean INR 2,552.06 (max INR 14,766.55).
 
 K-means (StandardScaler, n_init=10, random_state=42). Chosen K = 4.
@@ -104,8 +106,27 @@ K	2	3	4	5	6	7	8
 Inertia	1820.8	1268.2	743.1	617.4	503.2	408.5	366.5
 Silhouette	0.465	0.445	0.526	0.480	0.482	0.416	0.412
 
-TODO (2 to 3 sentences): why K = 4 (elbow, silhouette peak, usable by the business). 
-TODO (2 to 3 sentences): why K=8 always has lower inertia than K=2, yet that cannot pick K.
+## Why K = 4:
+Inertia drops about 41% from K=3 to K=4 but only about 17% from K=4 to K=5, so the elbow is at 4. The silhouette score also peaks at K=4 (0.526). Four segments are few enough for the business to run a separate campaign for each.
+
+## K=8 vs K=2:
+Every extra cluster puts a centre closer to some points, so inertia can only fall as K grows, and it would reach zero if each customer were its own cluster. A lower inertia at K=8 therefore shows only that there are more clusters, so K has to be chosen using the elbow, the silhouette score and business usefulness.
+
+## Segment actions (table column):
+
+Occasional Shoppers: send small nudges and starter discounts to build an ordering habit.
+Premium Big-Ticket Buyers: give early access to electronics launches and free-delivery perks.
+Frequent Loyalists: run a rewards programme and bundle offers to raise basket size.
+Dormant At-Risk: run a time-limited win-back coupon.
+
+Frequency means (one sentence):
+The scaler learned its mean from the 924 training rows only, while the full-cohort mean also includes the 232 test rows, which have a slightly lower average frequency (about 7.7), so the two numbers differ.
+
+Model choice:
+I selected the random forest. It had the higher cross-validated F1 (0.681 vs 0.651) and a slightly higher test F1 (0.655 vs 0.648), and it raised fewer false alarms (30 vs 32). Both models catch the same 58 of 89 lapsing customers. Missing a lapsing customer loses someone who could have been retained, while wrongly targeting a loyal customer only wastes a discount, so recall matters. The retention team’s budget is limited, so precision still counts, and the forest balances the two best.
+
+Balancing:
+Recall moved most, from 0.652 to 0.854 (+0.202), while precision fell slightly (0.644 to 0.589). The retention team would miss far fewer lapsing customers (31 down to 13) but would contact more loyal customers by mistake (32 up to 53), so this suits a cheap campaign better than an expensive one.
 
 Segments (cluster numbers are only labels with no ordering; Premium = highest mean monetary).
 
@@ -157,7 +178,8 @@ Few-shot	147	100% (147/147)	22,504	153.1
 
 Zero-shot errors: 11 fraud tickets predicted billing, 10 technical tickets predicted billing (all other cells correct: billing 38, delivery 36, technical 29, fraud 23).
 
-TODO (3 to 4 sentences): when the extra few-shot tokens (about 92 per ticket) are worth paying for.
+Few-shot cost:
+The few-shot prompt costs about 92 extra tokens per ticket (153.1 vs 60.8, so 22,504 tokens in total against 8,932), but accuracy rises from 85.7% to 100%, removing all 21 errors. Eleven of those were fraud tickets sent to billing, which would have missed the security team and HIGH priority, so for fraud the extra tokens are clearly worth paying. When the stakes are low or the token budget is tight, zero-shot may be enough.
 
 Budget and routing: zero-shot with TOKEN_BUDGET = 6000 used 6,023 tokens and 51 tickets ended budget_exhausted (triage_budget_demo.csv). Final few-shot run (budget 100000), 164 rows in triage_results.csv: human_review 17, security_team (HIGH) 34, premium_desk (HIGH) 11, support_queue 102.
 
@@ -170,7 +192,21 @@ Overlap 0	12	10	2
 
 At overlap 0 two questions break: the refund delivery-time question and the payment-failure question.
 
-TODO (2 sentences): what TF and IDF measure, plus one limitation of TF-IDF. TODO (2 to 3 sentences): why those two questions break at overlap 0 and how overlap fixes it.
+TF and IDF:
+TF (term frequency) measures how often a word appears in a chunk, and IDF (inverse document frequency) lowers the weight of words that appear in many chunks, so rare and informative words count more. A limitation is that TF-IDF matches exact words only, so a question such as “money back” can miss a policy that says “refund”.
+
+Why overlap 0 breaks two questions:
+Without overlap, a chunk boundary cut the answer sentence in two, so the retrieved chunk held only part of it, for example the refund answer lost “more than 45 minutes” and the payment answer lost “within 48 hours”. The 10-word overlap repeats the end of one chunk at the start of the next, so each sentence appears whole in at least one chunk.
+
+ReAct vs plan-and-execute (about 200 words, limit 250):
+My ReAct agent asks the model for one tool at a time. It used 5 model calls for a full refund (S1), 4 for an on-time order (S4), 3 for a cancelled order (S5) and 2 for a missing order (S6). Each call resends the growing message history, so tokens rise at every step (S1 used 1,112), but the agent stops as soon as it has an answer. A plan-and-execute design asks for the whole step list in one call, which could be fewer calls and tokens for a normal refund. But it plans before seeing any result, so for a missing or cancelled order the planned steps would still run or fail, and the agent would need to replan, costing extra calls. ReAct handles these surprises naturally: S6 stopped after 2 calls and S5 after 3, because each decision depends on the last observation. I would choose ReAct for this refund workflow. Decisions depend on the order’s status, delivery time and amount (above INR 1,000 goes to a human), money is involved, and checking each result before acting is safer. Each step is also checkpointed, so a crashed run can resume.
+
+Limitations and next steps
+Three next steps:
+
+* Use a time-based train and test split (train on earlier months, test on later ones) to reflect real use.
+* Add an idempotency key per order so a refund cannot be issued twice.
+* Replace TF-IDF with embedding-based retrieval so differently worded questions still find the right policy.
 
 Tools (TOOLS_SPEC, TOOL_MAP): get_order, search_policy, calculate_refund (100% if more than 45 minutes, else 0), issue_refund and escalate_to_human (both write to refund_ledger.jsonl).
 
@@ -193,7 +229,5 @@ TODO (at most 250 words): ReAct vs plan-and-execute, using S1 5, S4 4, S5 3, S6 
 •	Data is synthetic and the model is a rule-based mock, so accuracy figures (such as 100% few-shot) say little about real tickets.
 •	The retention list is illustrative and not a leakage-free evaluation: the Premium flag is a post-hoc whole-window label that includes September.
 •	Lapse model uses one cutoff and one random split; TF-IDF retrieval is lexical; the refund ledger has no idempotency check (the crash demo refunds S1 twice across runs).
-
-TODO: two or three next steps in your own words (for example time-based split, idempotency key, embedding retrieval).
 
 

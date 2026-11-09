@@ -3,14 +3,25 @@ One internal tool in four connected parts: clean the order data (A), segment cus
 Before submitting: write each TODO in your own words, then delete this note.
 
 ## Overview
-Part	What it does	Main outputs
-A	Audit, clean, store, query	data/clean/*.csv, data/instamart.db, sql/queries.sql
-B	K-means segments, lapse model	outputs/customer_segments.csv, lapse_model.joblib, retention_list.csv
-C	Redact, classify, route tickets	outputs/triage_results.csv, triage_budget_demo.csv
-D	Policy RAG and refund agent	outputs/agent_runs.jsonl, refund_ledger.jsonl, state/
+Part	        What it does	                Main outputs
+  A	    Audit, clean, store, query	      data/clean/*.csv, data/instamart.db, sql/queries.sql
+  B	    K-means segments, lapse model	    outputs/customer_segments.csv, lapse_model.joblib, retention_list.csv
+  C	    Redact, classify, route tickets	  outputs/triage_results.csv, triage_budget_demo.csv
+  D	    Policy RAG and refund agent	      outputs/agent_runs.jsonl, refund_ledger.jsonl, state/
 
 Code is in src/ (one numbered script per step, plus lapse_features.py, rag.py, agent.py).
 
+## setup processi
+Install Python 3.11+ recommended and install Github in your system, if not please install git.
+clone the repo using git clone repo_link
+Once you cloned the repo the install below one by one.
+1. install the requirements into the active "venv" once you installed python.
+2. py -m venv .venv
+3. .venv\Scripts\Activate.ps1
+5. python -m pip install -r requirements.txt
+   Your project has a requirements.txt in the file list, so this installs everything the project needs, including pandas. If that fails for any reason, install pandas numpy.
+6. python -m pip install pandas numpy
+   
 ## Reproduce
 Run from the repo root. Python 3.11 or newer (built on 3.14).
 
@@ -18,20 +29,22 @@ Run from the repo root. Python 3.11 or newer (built on 3.14).
 2.	cd instamart-copilot
 3.	python -m venv .venv
 4.	Activate: .venv\Scripts\activate (Windows) or source .venv/bin/activate (Mac/Linux)
-5.	pip install -r requirements.txt
-6.	python generate_data.py (last line: generated: customers=1200 products=40 orders_raw=13084 tickets=164)
-7.	python src/01_audit.py
-8.	python src/02_clean.py
-9.	python src/03_validate.py (prints ALL CHECKPOINTS PASSED)
-10.	python src/04_sql.py
-11.	python src/05_pandas.py
-12.	python src/06_segments.py
-13.	python src/07_lapse_prep.py
-14.	python src/08_lapse_models.py
-15.	python src/09_lapse_outputs.py
-16.	python src/10_triage.py
-17.	python src/11_rag_eval.py
-18.	python src/12_agent_runs.py
+5.	python -m pip install -r requirements.txt
+   Your project has a requirements.txt in the file list, so this installs everything the project needs, including pandas. If that fails for any reason, install pandas numpy.
+6.  python -m pip install pandas numpy
+7.	python generate_data.py (last line: generated: customers=1200 products=40 orders_raw=13084 tickets=164)
+8.	python src/01_audit.py
+9.	python src/02_clean.py
+10.	python src/03_validate.py (prints ALL CHECKPOINTS PASSED)
+11.	python src/04_sql.py
+12.	python src/05_pandas.py
+13.	python src/06_segments.py
+14.	python src/07_lapse_prep.py
+15.	python src/08_lapse_models.py
+16.	python src/09_lapse_outputs.py
+17.	python src/10_triage.py
+18.	python src/11_rag_eval.py
+19.	python src/12_agent_runs.py
 
 Seeds are fixed (42 everywhere), so results repeat.
 

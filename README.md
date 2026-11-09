@@ -78,7 +78,6 @@ Q5 CTEs	550 customers above the average INR 2,552.06
 Q6 window ranks	8 rows where RANK differs from ROW_NUMBER. Top per city: Bengaluru C0082 12,856.20; Chennai C0930 10,151.40; Delhi C0291 13,742.60; Hyderabad C0743 12,730.05; Mumbai C0693 14,766.55; Pune C0426 10,377.10
 Q7 running total	183 days, last cumulative INR 2,998,668.80
 
-TODO (one sentence):
 When two customers in a city have exactly the same total spend, RANK() gives them the same rank and then skips a number, while ROW_NUMBER() still gives every row a unique number, so the two columns differ from the second tied row onward.
 
 pandas cross-check: the pivot table (margins=True) grand total is INR 2,998,668.80, equal to the SQL total.
@@ -93,7 +92,6 @@ Pune	500,918.05	252.48	1,984
 
 Completed order_amount: mean 269.91, median 135.00, skewness 4.61, Q1 64.80, Q3 297.00, fences -283.50 / 645.30, outliers 0 below and 897 above. Strongest correlation: order_amount with discount_pct, -0.095 (order_amount with quantity +0.087; all others near 0).
 
-TODO: 
 This data is 11,110 completed Instamart orders across six cities, with amount, discount, quantity and delivery time, all in INR. Order amounts are strongly right-skewed: the mean (269.91) is about double the median (135.00), and skewness is 4.61, so most orders are small and a few large ones pull the mean up. There are 897 outliers above the upper fence of 645.30 and none below. They look like genuine high-priced purchases, mostly electronics, so I kept them. The data errors in the raw files (duplicates, negative delivery times, unparseable amounts) were fixed during cleaning. All relationships are weak. The largest correlation is order_amount with discount_pct at -0.095, and order_amount with quantity is +0.087. A correlation this small does not establish causation, so I cannot say that discounts cause lower order amounts.
 
 ## Part B
@@ -130,16 +128,14 @@ Recall moved most, from 0.652 to 0.854 (+0.202), while precision fell slightly (
 Segments (cluster numbers are only labels with no ordering; Premium = highest mean monetary).
 
 Segment (id)	Size	Recency	Frequency	Monetary (INR)	Premium	Action
-Occasional Shoppers (0)	436	28.86	3.77	1,057.62	no	TODO
-Premium Big-Ticket Buyers (1)	138	24.12	6.77	7,129.70	yes	TODO
-Frequent Loyalists (2)	419	8.77	19.40	3,410.02	no	TODO
-Dormant At-Risk (3)	182	109.04	2.20	685.99	no	TODO
+Occasional Shoppers (0)	436	28.86	3.77	1,057.62	no	
+Premium Big-Ticket Buyers (1)	138	24.12	6.77	7,129.70	yes	
+Frequent Loyalists (2)	419	8.77	19.40	3,410.02	no
+Dormant At-Risk (3)	182	109.04	2.20	685.99	no
 
 PCA explained variance: 0.634 and 0.218 (total 0.852).
 
 Lapse problem (cutoff 2025-09-01): cohort 1,156; lapsed 443 (38.32%); train/test 924 / 232; baseline "always not lapsed" gives accuracy 61.6% and lapsed-class F1 0. Features come only from orders before the cutoff plus the customer table. One-hot encoding (drop="first", 19 encoded columns) and scaling sit inside a Pipeline fitted on training rows; no missing values in any feature. Frequency mean: 8.115 (training rows) vs 8.029 (full cohort).
-
-TODO (one sentence): why those two means differ.
 
 Models (lapsed class is positive; confusion matrix rows are actual 0/1, columns predicted 0/1)
 Model	Best parameters	CV F1	Test confusion	Precision	Recall	F1
@@ -149,12 +145,7 @@ Logistic regression, balanced training data	C = 100	n/a	[[90,53],[13,76]]	0.589	
 
 Balancing: lapsed training rows duplicated (random_state=42) to 570 per class; recall +0.202, precision -0.055, F1 +0.049.
 
-TODO (3 to 5 sentences): your chosen model and why (cost of missing a lapsing customer vs wrongly targeting a loyal one). Make SELECTED in src/09_lapse_outputs.py match. 
-TODO (2 to 3 sentences): which metric moved most after balancing and what it means for retention.
-
 Interpretation: top random-forest features: frequency 0.280, monetary 0.271, recency 0.115, avg delivery 0.061, cancellation rate 0.052. Logistic coefficients: recency +0.040, frequency -1.698, monetary +0.285, avg discount +0.004, cancellation rate -0.124, avg delivery +0.079, age +0.023, tenure -0.050.
-
-TODO (one line each): business reading of three coefficient signs.
 
 Saved model and retention list: the model is saved with joblib.dump, and the reloaded copy reproduces the test predictions exactly. The test set has 40 Premium customers; retention_list.csv holds the top 10 by lapse probability, and 1 of them truly lapsed. The retention list is illustrative and not a leakage-free evaluation, because the Premium flag comes from whole-window RFM that includes September.
 
@@ -222,7 +213,7 @@ Stop-safely demos: S1 with token_limit = 200 ends FALLBACK_TOKEN_LIMIT; S1 with 
 
 Crash and resume (S1): crash after the second tool, then resume_agent. Tools executed in order: get_order, search_policy, calculate_refund, issue_refund (four, none repeated); final REFUND 128.25.
 
-TODO (at most 250 words): ReAct vs plan-and-execute, using S1 5, S4 4, S5 3, S6 2 model calls; cover calls and tokens, surprises like NOT_FOUND or a cancelled order, and your choice.]’
+ReAct vs plan-and-execute, using S1 5, S4 4, S5 3, S6 2 model calls; cover calls and tokens, surprises like NOT_FOUND or a cancelled order, and your choice.
 
 ## Limitations and Next Steps
 •	Data is synthetic and the model is a rule-based mock, so accuracy figures (such as 100% few-shot) say little about real tickets.

@@ -1,11 +1,10 @@
 ## Instamart Customer Intelligence & Support Copilot
 One internal tool in four connected parts: clean the order data (A), segment customers and predict lapse (B), triage support tickets safely (C), answer policy questions and decide refunds with an agent (D). All data is synthetic, all money is in INR, and every model call uses the offline mock_llm.py (no API key, no network).
-Before submitting: write each TODO in your own words, then delete this note.
 
 ## Overview
 Part	        What it does	                Main outputs
   A	    Audit, clean, store, query	      data/clean/*.csv, data/instamart.db, sql/queries.sql
-  B	    K-means segments, lapse model	    outputs/customer_segments.csv, lapse_model.joblib, retention_list.csv
+  B	    K-means segments, lapse model	  outputs/customer_segments.csv, lapse_model.joblib,            retention_list.csv
   C	    Redact, classify, route tickets	  outputs/triage_results.csv, triage_budget_demo.csv
   D	    Policy RAG and refund agent	      outputs/agent_runs.jsonl, refund_ledger.jsonl, state/
 

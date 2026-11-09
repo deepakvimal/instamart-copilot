@@ -10,18 +10,7 @@ Part	        What it does	                Main outputs
   D	    Policy RAG and refund agent	      outputs/agent_runs.jsonl, refund_ledger.jsonl, state/
 
 Code is in src/ (one numbered script per step, plus lapse_features.py, rag.py, agent.py).
-
-## setup processi
-Install Python 3.11+ recommended and install Github in your system, if not please install git.
-clone the repo using git clone repo_link
-Once you cloned the repo the install below one by one.
-1. install the requirements into the active "venv" once you installed python.
-2. py -m venv .venv
-3. .venv\Scripts\Activate.ps1
-5. python -m pip install -r requirements.txt
-   Your project has a requirements.txt in the file list, so this installs everything the project needs, including pandas. If that fails for any reason, install pandas numpy.
-6. python -m pip install pandas numpy
-   
+  
 ## Reproduce
 Run from the repo root. Python 3.11 or newer (built on 3.14).
 

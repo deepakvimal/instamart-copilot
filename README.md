@@ -18,7 +18,6 @@ Run from the repo root. Python 3.11 or newer (built on 3.14).
 3.	python -m venv .venv
 4.	Activate: .venv\Scripts\activate (Windows) or source .venv/bin/activate (Mac/Linux)
 5.	python -m pip install -r requirements.txt
-   Your project has a requirements.txt in the file list, so this installs everything the project needs, including pandas. If that fails for any reason, install pandas numpy.
 6.  python -m pip install pandas numpy
 7.	python generate_data.py (last line: generated: customers=1200 products=40 orders_raw=13084 tickets=164)
 8.	python src/01_audit.py
@@ -37,9 +36,7 @@ Run from the repo root. Python 3.11 or newer (built on 3.14).
 Seeds are fixed (42 everywhere), so results repeat.
 
 ## Part A
-the Reproduce steps, the audit table, the cleaning rules with their counts, the SQL results, and the pandas findings. 
-I’ll help you assemble these once all the parts are done, so you only write the README once.
-
+the Reproduce steps, the audit table, the cleaning rules with their counts, the SQL results, and the pandas findings.
 Setup: branch main, virtual environment, requirements.txt from pip freeze, .gitignore with .env, .venv/, __pycache__/.
 Audit (raw data): customers 1,200 x 5, products 40 x 4, orders 13,084 x 9.
 
